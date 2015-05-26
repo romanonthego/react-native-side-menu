@@ -187,7 +187,7 @@ var SideMenu = React.createClass({
     return(
       React.Children.map(this.props.children, function(child) {
         return React.cloneElement(child, {
-          menuActions: this.getMenuActions();
+          menuActions: this.getMenuActions(),
         });
       });
     );
