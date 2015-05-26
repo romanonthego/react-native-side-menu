@@ -8,6 +8,7 @@ var queueAnimation = require('./animations');
 var {
   PanResponder,
   View,
+  TouchableWithoutFeedback,
 } = React;
 
 /**
@@ -181,23 +182,42 @@ var SideMenu = React.createClass({
     this.prevLeft = this.left;
   },
 
+
+  getContentCompoent: function() {
+    return(
+      React.Children.map(this.props.children, function(child) {
+        return React.cloneElement(child, {
+          menuActions: this.getMenuActions();
+        });
+      });
+    );
+  },
+
   /**
    * Get content view. This view will be rendered over menu
    * @return {React.Component}
    */
   getContentView: function() {
     var getMenuActions = this.getMenuActions();
+    
     return (
       <View
         style={styles.frontView}
         ref={(sideMenu) => this.sideMenu = sideMenu}
-        {...this.responder.panHandlers}>
+        {...this.responder.panHandlers}
+      >
+        
+        {this.isOpen && this.props.closeOnContentTouch
+          <TouchableWithoutFeedback style={{flex: 1}} onPressIn={() => {getMenuActions.close()}}>
+            {this.getContentCompoent()}
+          </TouchableWithoutFeedback>
+        }
 
-        {React.Children.map(this.props.children, function(child) {
-          return React.cloneElement(child, {
-            menuActions: getMenuActions
-          });
-        })}
+        {!this.isOpen || !this.props.closeOnContentTouch
+          <View style={{flex: 1}}>
+            {this.getContentCompoent()}
+          </View>
+        }
       </View>
     );
   },
